@@ -1,25 +1,58 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import Register from './components/Register';
+import Login from './components/Login';
+import Home from './components/Home';
+import Layout from './components/Layout';
+import Editor from './components/Editor';
+import Admin from './components/Admin';
+import Missing from './components/Missing';
+import Unauthorized from './components/Unauthorized';
+import Lounge from './components/Lounge';
+import LinkPage from './components/LinkPage';
+import RequireAuth from './components/RequireAuth';
+import PresistLogin from './components/PresistLogin';
+import { Routes, Route } from 'react-router-dom';
+
+const ROLES = {
+    user: 2001,
+    editor: 1948,
+    admin: 5150,
+};
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    return (
+        <Routes>
+            <Route path='/' element={<Layout />}>
+                {/* PUBLICK ROUTES */}
+                <Route path='login' element={<Login />} />
+                <Route path='register' element={<Register />} />
+                <Route path='linkpage' element={<LinkPage />} />
+                <Route path='unauthorized' element={<Unauthorized />} />
+
+                {/* PROTECTED ROUTES */}
+                <Route element={<PresistLogin />}>
+                    <Route element={<RequireAuth allowedRoles={[ROLES.user]} />}>
+                        <Route path='/' element={<Home />} />
+                    </Route>
+
+                    <Route element={<RequireAuth allowedRoles={[ROLES.editor]} />}>
+                        <Route path='editor' element={<Editor />} />
+                    </Route>
+
+                    <Route element={<RequireAuth allowedRoles={[ROLES.admin]} />}>
+                        <Route path='admin' element={<Admin />} />
+                    </Route>
+
+                    <Route element={<RequireAuth allowedRoles={[ROLES.editor, ROLES.admin]} />}>
+                        <Route path='lounge' element={<Lounge />} />
+                    </Route>
+                </Route>
+
+                {/* CATCH ALL */}
+                <Route path='*' element={<Missing />} />
+            </Route>
+        </Routes>
+    );
 }
 
 export default App;
